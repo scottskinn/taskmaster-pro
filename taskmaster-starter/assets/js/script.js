@@ -207,14 +207,19 @@ $("#remove-tasks").on("click", function() {
 });
 
 
-  // this is were the lists are made sortable
-  $(".card .list-group").sortable({
-    connectWith: $(".card .list-group"),
-    scroll: false,
-    tolerance: "pointer",
-    helper: "clone",
+// this is were the lists are made sortable
+$(".card .list-group").sortable({
+  connectWith: $(".card .list-group"),
+  scroll: false,
+  tolerance: "pointer",
+  helper: "clone",
+  // activate: ".dropover",
+  // deactivate: ".dropover",
+  // over: ".dropover-active",
+  // out: ".dropover-active",
 
-    update: function(event) {
+
+  update: function(event) {
   // array to store the task data in
   var tempArr = [];
 
@@ -249,49 +254,66 @@ $("#remove-tasks").on("click", function() {
 }
 });
 
-  // trash div that allows the groups it can delete
-  $("#trash").droppable({
-    accept: ".card .list-group-item",
-    tolerance: "touch",
-    drop: function(event, ui) {
-      ui.draggable.remove();
-      console.log("drop");
-    },
-    over: function(event, ui) {
-      console.log("over");
-    },
-    out: function(event, ui) {
-      console.log("out");
-    }
-  });
+// trash div that allows the groups it can delete
+$("#trash").droppable({
+  accept: ".card .list-group-item",
+  tolerance: "touch",
+  drop: function(event, ui) {
+    ui.draggable.remove();
+    console.log("drop");
+  },
+  over: function(event, ui) {
+    console.log("over");
+  },
+  out: function(event, ui) {
+    console.log("out");
+  }
+});
 
-  // date picker
-  $("#modalDueDate").datepicker({
-    // this sets the last day you can pick
-    minDate: 1  
-  });
+// date picker
+$("#modalDueDate").datepicker({
+  // this sets the last day you can pick
+  minDate: 1  
+});
 
-  var auditTask = function(taskE1) {
-    // get date from task element
-    var date = $(taskE1).find("span").text().trim();
-    // ensure it works
-    console.log(date);
 
-    // convert to moment object at 5:00pm
-    var time = moment(date, "L").set("hour", 17);
-      // this should print out an object for the value of the date variable, but at 5:00pm of that date
-      console.log(time);
+var auditTask = function(taskE1) {
+  // get date from task element
+  var date = $(taskE1).find("span").text().trim();
+  // ensure it works
+  console.log(date);
 
-    $(taskE1).removeClass("list-group-item-warning list-group-item-danger");
+  // convert to moment object at 5:00pm
+  var time = moment(date, "L").set("hour", 17);
+    // this should print out an object for the value of the date variable, but at 5:00pm of that date
+    console.log(time);
 
-    //apply new class if task is near/over due date
-    if (moment().isAfter(time)) {
-      $(taskE1).addClass("list-group-item-danger");
-    }
-    else if (Math.abs(moment().diff(time, "days")) <=2) {
-      $(taskE1).addClass("list-group-item-warning");
-    }
-  };
+  $(taskE1).removeClass("list-group-item-warning list-group-item-danger");
+
+  //apply new class if task is near/over due date
+  if (moment().isAfter(time)) {
+    $(taskE1).addClass("list-group-item-danger");
+  }
+  else if (Math.abs(moment().diff(time, "days")) <=2) {
+    $(taskE1).addClass("list-group-item-warning");
+  }
+
+
+
+
+};
+
+  // this will save the page every 30 minutes
+  setInterval(function() {
+    $(".card .list-group-item").each(function(index, el) {
+      auditTask(el);
+    });
+    
+  }, (1000 * 60) * 30);
+
+  
+
 
 // load tasks for the first time
 loadTasks();
+
